@@ -4,7 +4,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
-import pyautogui
 import os
 import random
 
@@ -18,20 +17,16 @@ def search(mode):
             search_form.send_keys(word)
             search_form.submit()
             x += 1
-            logger.debug(f'Searched {word} {x}/30')
+            logger.debug(f'Desktop searched {word} {x}/30')
     elif mode == 'mobile':
         while x < 20:
             word = random.choice(WORDS)
-            search_form = driver.find_element_by_class_name('b_searchbox')
+            search_form = driver.find_element_by_id('sb_form_q')
             search_form.clear()
             search_form.send_keys(word)
             search_form.submit()
             x += 1
-            logger.debug(f'Searched {word} {x}/20')
-
-def change_viewport():
-    pyautogui.press('f12')
-    pyautogui.hotkey('ctrl', 'shift', 'm')
+            logger.debug(f'Mobile searched {word} {x}/20')
 
 def complete_tasks():
     pass
@@ -42,19 +37,30 @@ profile_path = 'C:\\Users\\arlan\\AppData\\Local\\Google\\Chrome\\User Data'
 word_file = os.getcwd() + '\\words.txt'
 WORDS = open(word_file).read().splitlines()
 
-options = Options()
-options.add_argument('user-data-dir=' + profile_path)
-options.add_experimental_option('excludeSwitches', ['enable-logging']) # disables chrome logging on terminal
-# options.headless = True
+desktop_options = Options()
+desktop_options.add_argument('user-data-dir=' + profile_path)
+desktop_options.add_experimental_option('excludeSwitches', ['enable-logging']) # disables chrome logging on terminal
+# desktop_options.headless = True
 
-pyautogui.PAUSE = 1.0
+mobile_options = Options()
+mobile_options.add_argument('user-data-dir=' + profile_path)
+mobile_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+mobile_emulation = { "deviceName": "Pixel 2" }
+mobile_options.add_experimental_option("mobileEmulation", mobile_emulation)
+# mobile_options.headless = True
 
-with Chrome(executable_path=path, options=options) as driver:
+with Chrome(executable_path=path, options=desktop_options) as driver:
     driver.implicitly_wait(3)
     driver.get('https://bing.com')
-    logger.debug('Accessed Bing')
+    logger.debug('Accessing desktop browser')
     search('desktop')
-    change_viewport()
+    logger.debug('Quitting desktop browser')
+
+with Chrome(executable_path=path, options=mobile_options) as driver:
+    driver.implicitly_wait(3)
+    driver.get('https://bing.com')
+    logger.debug('Accessing mobile browser')
     search('mobile')
-    change_viewport()
-    pass
+    logger.debug('Quitting mobile browser')
+
+logger.debug('Done.')
