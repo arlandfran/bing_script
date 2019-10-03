@@ -8,8 +8,8 @@ import os
 import random
 
 def search(mode):
-    x = 0
     if mode == 'desktop':
+        x = 0
         while x < 30:
             word = random.choice(WORDS)
             search_form = driver.find_element_by_class_name('b_searchbox')
@@ -19,6 +19,7 @@ def search(mode):
             x += 1
             logger.debug(f'Desktop searched {word} {x}/30')
     elif mode == 'mobile':
+        x = 0
         while x < 20:
             word = random.choice(WORDS)
             search_form = driver.find_element_by_id('sb_form_q')
