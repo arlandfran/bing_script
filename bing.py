@@ -3,9 +3,11 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from timeit import default_timer as timer
 
 import os
 import random
+
 
 def search(mode):
     if mode == 'desktop':
@@ -29,8 +31,6 @@ def search(mode):
             x += 1
             logger.debug(f'Mobile searched {word} {x}/20')
 
-def complete_tasks():
-    pass
 
 path = os.getcwd() + '\\chromedriver.exe'
 profile_path = 'C:\\Users\\arlan\\AppData\\Local\\Google\\Chrome\\User Data'
@@ -40,16 +40,18 @@ WORDS = open(word_file).read().splitlines()
 
 desktop_options = Options()
 desktop_options.add_argument('user-data-dir=' + profile_path)
-desktop_options.add_experimental_option('excludeSwitches', ['enable-logging']) # disables chrome logging on terminal
-# desktop_options.headless = True
+# disables chrome logging on terminal
+desktop_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+desktop_options.headless = True
 
 mobile_options = Options()
 mobile_options.add_argument('user-data-dir=' + profile_path)
 mobile_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-mobile_emulation = { "deviceName": "Pixel 2" }
+mobile_emulation = {"deviceName": "Pixel 2"}
 mobile_options.add_experimental_option("mobileEmulation", mobile_emulation)
-# mobile_options.headless = True
+mobile_options.headless = True
 
+t_start = timer()
 with Chrome(executable_path=path, options=desktop_options) as driver:
     driver.implicitly_wait(3)
     driver.get('https://bing.com')
@@ -64,4 +66,5 @@ with Chrome(executable_path=path, options=mobile_options) as driver:
     search('mobile')
     logger.debug('Quitting mobile browser')
 
-logger.debug('Done.')
+t_end = timer()
+logger.debug('Ran script in ' + str(t_end - t_start) + 's')
